@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,8 @@ Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])->nam
 // ✅ Put all specific routes before {patient} parameter route
 Route::get('/patients/export', [PatientController::class, 'export'])->name('patients.export');
 Route::post('/patients/import', [PatientController::class, 'import'])->name('patients.import');
+
+
 
 // Parameter route should be last
 Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
