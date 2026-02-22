@@ -67,7 +67,7 @@
 <div class="login-container">
     <div class="login-card">
         <div class="text-center login-header mb-4">
-            <h3>Clinical Management System</h3>
+            <h3>Kahut Clinic</h3>
             <p>Secure Login to Continue</p>
         </div>
 
