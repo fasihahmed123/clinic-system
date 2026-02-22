@@ -28,14 +28,20 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 🔹 Patient CRUD routes
-    Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
-    Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
-    Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
-    Route::get('/patients/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
-    Route::put('/patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
-    Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])->name('patients.destroy');
-    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
+    // Patient CRUD routes
+Route::get('/patients', [PatientController::class, 'index'])->name('patients.index');
+Route::get('/patients/create', [PatientController::class, 'create'])->name('patients.create');
+Route::post('/patients', [PatientController::class, 'store'])->name('patients.store');
+Route::get('/patients/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
+Route::put('/patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
+Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])->name('patients.destroy');
+
+// ✅ Put all specific routes before {patient} parameter route
+Route::get('/patients/export', [PatientController::class, 'export'])->name('patients.export');
+Route::post('/patients/import', [PatientController::class, 'import'])->name('patients.import');
+
+// Parameter route should be last
+Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
 });
 
 require __DIR__.'/auth.php';

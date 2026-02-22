@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Patient;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Response;
 
 class PatientController extends Controller
 {
@@ -123,4 +125,61 @@ class PatientController extends Controller
         $patient = Patient::findOrFail($id);
         return view('patients.show', compact('patient'));
     }
+
+    public function export()
+{
+    $patients = Patient::all();
+
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename="Patient Records.csv"',
+    ];
+
+    $columns = [
+        'pr_no', 'patient_name', 'email', 'cnic', 'mobile', 'doctor_name', 'prescription', 'notes', 'age', 'gender'
+    ];
+
+    $callback = function() use ($patients, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+
+        foreach ($patients as $patient) {
+            $row = [];
+            foreach ($columns as $col) {
+                $row[] = $patient->$col;
+            }
+            fputcsv($file, $row);
+        }
+
+        fclose($file);
+    };
+
+    return Response::stream($callback, 200, $headers);
+}
+
+public function import(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:csv,txt',
+    ]);
+
+    $file = $request->file('file');
+    $path = $file->getRealPath();
+    $data = array_map('str_getcsv', file($path));
+
+    $header = array_map('trim', $data[0]); // First row as header
+    unset($data[0]);
+
+    foreach ($data as $row) {
+        $rowData = array_combine($header, $row);
+
+        // Update if pr_no exists, else create new
+        \App\Models\Patient::updateOrCreate(
+            ['pr_no' => $rowData['pr_no']],
+            $rowData
+        );
+    }
+
+    return redirect()->route('patients.index')->with('success', 'CSV Imported Successfully');
+}
 }

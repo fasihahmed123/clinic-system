@@ -4,9 +4,37 @@
 <div class="container-fluid py-4">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="fw-bold">Patient Records</h2>
+    <h2 class="fw-bold">Patient Records</h2>
+    <div class="d-flex gap-2">
+
+        <!-- Add Patient -->
         <a href="{{ route('patients.create') }}" class="btn btn-primary btn-lg">+ Add Patient</a>
+
+        <!-- Export -->
+        <a href="{{ route('patients.export') }}" class="btn btn-success btn-lg">Export Records</a>
+
+        <!-- Import -->
+        <form action="{{ route('patients.import') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <label class="btn btn-warning btn-lg mb-0" for="import-file">Import Records</label>
+            <input type="file" name="file" id="import-file" accept=".csv" style="display:none;">
+        </form>
     </div>
+</div>
+
+<script>
+document.getElementById('import-file').addEventListener('change', function(){
+    // submit the parent form
+    this.form.submit();
+});
+</script>
+
+<script>
+    // Automatically submit the import form after file selection
+    document.getElementById('import-file').addEventListener('change', function(){
+        document.getElementById('import-submit').click();
+    });
+</script>
 
     <!-- Search Bar -->
     <form method="GET" action="{{ route('patients.index') }}" class="mb-4">
