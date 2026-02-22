@@ -11,8 +11,9 @@
     <!-- Search Bar -->
     <form method="GET" action="{{ route('patients.index') }}" class="mb-4">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Search by CNIC..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control" placeholder="Search by PR-No or CNIC..." value="{{ request('search') }}">
             <button class="btn btn-outline-primary" type="submit">Search</button>
+            <a href="{{ route('patients.index') }}" class="btn btn-outline-secondary">Reset</a>
         </div>
     </form>
 
@@ -22,34 +23,39 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-primary">
                     <tr>
-                        <th>#</th>
+                        <th>PR-No</th>
                         <th>Patient Name</th>
                         <th>E-mail</th>
                         <th>CNIC</th>
+                        <th>Mobile</th>
                         <th>Doctor</th>
                         <th>Prescription</th>
-                        <th>Notes</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($patients as $patient)
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $patient->patient_name }}</td>
+                        <td>{{ $patient->pr_no }}</td>
+                        <td>
+                            <a href="{{ route('patients.show', $patient->id) }}" class="text-decoration-none text-primary">
+                                {{ $patient->patient_name }}
+                            </a>
+                        </td>
                         <td>{{ $patient->email }}</td>
                         <td>{{ $patient->cnic }}</td>
+                        <td>{{ $patient->mobile }}</td>
                         <td>{{ $patient->doctor_name }}</td>
                         <td>{{ Str::limit($patient->prescription, 30) }}</td>
-                        <td>{{ Str::limit($patient->notes, 30) }}</td>
                         <td>
-                    <a href="{{ route('patients.edit', $patient->id) }}" class="btn btn-primary btn-sm">Edit</a>
-                    <form action="{{ route('patients.destroy', $patient->id) }}" method="POST" style="display:inline;" class="delete-form">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                </td>
+                            <a href="{{ route('patients.show', $patient->id) }}" class="btn btn-info btn-sm">View</a>
+                            <a href="{{ route('patients.edit', $patient->id) }}" class="btn btn-primary btn-sm">Edit</a>
+                            <form action="{{ route('patients.destroy', $patient->id) }}" method="POST" style="display:inline;" class="delete-form">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                     @empty
                     <tr>
@@ -59,10 +65,14 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <div class="p-3">
+            {{ $patients->withQueryString()->links() }}
+        </div>
     </div>
 
 </div>
-
 
 <!-- SweetAlert Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -9,6 +9,11 @@
         @method('PUT')
 
         <div class="mb-3">
+            <label class="form-label">PR Number</label>
+            <input type="text" class="form-control" value="{{ $patient->pr_no }}" readonly>
+        </div>
+
+        <div class="mb-3">
             <label class="form-label">Patient Name</label>
             <input type="text" name="patient_name" class="form-control" value="{{ old('patient_name', $patient->patient_name) }}" required>
         </div>
@@ -21,6 +26,11 @@
         <div class="mb-3">
             <label class="form-label">Email</label>
             <input type="email" name="email" class="form-control" value="{{ old('email', $patient->email) }}">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Mobile Number</label>
+            <input type="text" name="mobile" class="form-control" value="{{ old('mobile', $patient->mobile) }}">
         </div>
 
         <div class="mb-3">

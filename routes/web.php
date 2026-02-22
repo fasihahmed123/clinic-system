@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/patients/{patient}/edit', [PatientController::class, 'edit'])->name('patients.edit');
     Route::put('/patients/{patient}', [PatientController::class, 'update'])->name('patients.update');
     Route::delete('/patients/{patient}', [PatientController::class, 'destroy'])->name('patients.destroy');
+    Route::get('/patients/{patient}', [PatientController::class, 'show'])->name('patients.show');
 });
 
 require __DIR__.'/auth.php';

@@ -4,22 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Patient;
+use Illuminate\Support\Str;
 
 class PatientController extends Controller
 {
     // 🔹 Display list of patients with CNIC search and pagination
     public function index(Request $request)
-    {
-        $query = Patient::query();
+{
+    $query = Patient::query();
 
-        if ($request->search) {
-            $query->where('cnic', 'like', '%' . $request->search . '%');
-        }
-
-        $patients = $query->latest()->paginate(10)->withQueryString();
-
-        return view('patients.index', compact('patients'));
+    if ($request->search) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('pr_no', 'like', "%{$search}%")
+              ->orWhere('cnic', 'like', "%{$search}%");
+        });
     }
+
+    $patients = $query->latest()->paginate(10)->withQueryString();
+
+    return view('patients.index', compact('patients'));
+}
 
     // 🔹 Show create form
     public function create()
@@ -39,18 +44,28 @@ class PatientController extends Controller
             'doctor_name' => 'required|string',
             'prescription' => 'nullable|string',
             'notes' => 'nullable|string',
+            'mobile' => 'nullable|string|max:20',
         ]);
 
-        Patient::create($request->only([
-            'patient_name',
-            'cnic',
-            'email',
-            'age',
-            'gender',
-            'doctor_name',
-            'prescription',
-            'notes'
-        ]));
+        // 🔹 Generate unique PR number
+        do {
+            $pr_no = mt_rand(100000, 999999); // 6-digit numeric code
+        } while (Patient::where('pr_no', $pr_no)->exists());
+
+        Patient::create(array_merge(
+            $request->only([
+                'patient_name',
+                'cnic',
+                'email',
+                'age',
+                'gender',
+                'doctor_name',
+                'prescription',
+                'notes',
+                'mobile'
+            ]),
+            ['pr_no' => $pr_no]
+        ));
 
         return redirect()->route('patients.index')->with('success', 'Patient Added Successfully');
     }
@@ -76,6 +91,7 @@ class PatientController extends Controller
             'doctor_name' => 'required|string',
             'prescription' => 'nullable|string',
             'notes' => 'nullable|string',
+            'mobile' => 'nullable|string|max:20',
         ]);
 
         $patient->update($request->only([
@@ -86,7 +102,8 @@ class PatientController extends Controller
             'gender',
             'doctor_name',
             'prescription',
-            'notes'
+            'notes',
+            'mobile'
         ]));
 
         return redirect()->route('patients.index')->with('success', 'Patient Updated Successfully');
@@ -98,5 +115,12 @@ class PatientController extends Controller
         Patient::findOrFail($id)->delete();
 
         return redirect()->route('patients.index')->with('success', 'Patient Deleted Successfully');
+    }
+
+    // 🔹 Show single patient details
+    public function show($id)
+    {
+        $patient = Patient::findOrFail($id);
+        return view('patients.show', compact('patient'));
     }
 }
